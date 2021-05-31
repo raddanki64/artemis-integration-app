@@ -1,0 +1,47 @@
+spring:
+  application:
+    name: artemis-integration-app
+
+logging:
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%-5level] [%thread] [%logger]: %msg%n"
+  level:
+    com.ups.ops.scar.poc.api.controller: INFO
+    org.apache.qpid: INFO
+    org.apache.camel: INFO
+    org.hibernate: WARN
+
+---
+spring:
+  profiles: development
+
+  datasource:
+    driver-class-name: com.microsoft.sqlserver.jdbc.SQLServerDriver
+    url: jdbc:sqlserver://localhost;databaseName=appsdev
+    username: appsdev
+    password: appsdev2021
+
+  broker:
+    uri: amqps://localhost:5693?transport.verifyHost=false
+    user: tsocfuse
+    password: tsocpass
+
+  inbound:
+    endpoint: "appsBroker:queue:${QUEUE}?concurrentConsumers=${MIN_CONSUMERS}&maxConcurrentConsumers=${MAX_CONSUMERS}&maxMessagesPerTask=${MAX_MESSAGES}"
+    dlq: "appsBroker:queue:DLQ.${QUEUE}"
+
+QUEUE: UPLOAD.RAMESH
+MIN_CONSUMERS: 1
+MAX_CONSUMERS: 50
+MAX_MESSAGES: 1
+
+thread-pooling:
+  core-pool-size: 25
+  max-pool-size: 300
+
+server:
+  tomcat:
+    accept-count: 100
+    max-connections: 10000
+    max-threads: 200
+
